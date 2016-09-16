@@ -25,6 +25,12 @@ limitations under the License.
   </button>
   <button type="button" class="btn btn-default btn-sm"
           ng-if="paragraph.result.type == 'TABLE'"
+          ng-class="{'active': isGraphMode('pivot')}"
+          ng-click="setGraphMode('pivot', true)" 
+          tooltip="Pivot" tooltip-placement="bottom"><i class="fa fa-cube"></i>
+  </button>
+  <button type="button" class="btn btn-default btn-sm"
+          ng-if="paragraph.result.type == 'TABLE'"
           ng-class="{'active': isGraphMode('multiBarChart')}"
           ng-click="setGraphMode('multiBarChart', true)"
           tooltip="Bar Chart" tooltip-placement="bottom"><i class="fa fa-bar-chart"></i>

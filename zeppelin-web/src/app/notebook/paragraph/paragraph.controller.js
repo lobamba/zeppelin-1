@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* global $ */
 'use strict';
 
 angular.module('zeppelinWebApp').controller('ParagraphCtrl', function($scope, $rootScope, $route, $window,
@@ -86,6 +87,7 @@ angular.module('zeppelinWebApp').controller('ParagraphCtrl', function($scope, $r
     $scope.originalText = angular.copy(newParagraph.text);
     $scope.chart = {};
     $scope.baseMapOption = ['Streets', 'Satellite', 'Hybrid', 'Topo', 'Gray', 'Oceans', 'Terrain'];
+    $scope.pivotRendererName = ['Table', 'Table Barchart', 'Heatmap', 'Row Heatmap', 'Col Heatmap'];
     $scope.colWidthOption = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     $scope.paragraphFocused = false;
     if (newParagraph.focus) {
@@ -256,6 +258,31 @@ angular.module('zeppelinWebApp').controller('ParagraphCtrl', function($scope, $r
     if (config.enabled === undefined) {
       config.enabled = true;
     }
+
+    if (!config.graph.pivot) {
+      config.graph.pivot = {};
+    }
+
+    if (!config.graph.pivot.cols) {
+      config.graph.pivot.cols = [];
+    }
+
+    if (!config.graph.pivot.rows) {
+      config.graph.pivot.rows = [];
+    }
+
+    if (!config.graph.pivot.values) {
+      config.graph.pivot.values = [];
+    }
+
+    if (!config.graph.pivot.aggregatorName) {
+      config.graph.pivot.aggregatorName = 'Count';
+    }
+
+    if (!config.graph.pivot.rendererName) {
+      config.graph.pivot.rendererName = 'Table';
+    }
+
   };
 
   $scope.getIframeDimensions = function() {
@@ -955,6 +982,8 @@ angular.module('zeppelinWebApp').controller('ParagraphCtrl', function($scope, $r
         setTable($scope.paragraph.result, refresh);
       } else if (type === 'map') {
         setMap($scope.paragraph.result, refresh);
+      } else if (type === 'pivot') {
+        setTablePivot($scope.paragraph.result, refresh);
       } else {
         setD3Chart(type, $scope.paragraph.result, refresh);
       }
@@ -1037,6 +1066,53 @@ angular.module('zeppelinWebApp').controller('ParagraphCtrl', function($scope, $r
     };
     $timeout(retryRenderer);
 
+  };
+
+  var setTablePivot = function(data, refresh) {
+    var renderTablePivot = function() {
+      var resultRows = $scope.paragraph.result.rows;
+      var columnNames = _.pluck($scope.paragraph.result.columnNames, 'name');
+      var cols = objectToArray($scope.paragraph.config.graph.pivot.cols);
+      var rows = objectToArray($scope.paragraph.config.graph.pivot.rows);
+      var values = objectToArray($scope.paragraph.config.graph.pivot.values);
+      var container = angular.element('#p' + $scope.paragraph.id + '_pivot').css('overflow', 'auto').css('height',
+              '100%');
+      $scope.paragraph.config.pivot = jQuery.data(container[0], 'pivotUIOptions');
+      var utils = $.pivotUtilities;
+      var rendererName = utils.renderers[$scope.paragraph.config.graph.pivot.rendererName];
+      var aggregatorName = utils.aggregators[$scope.paragraph.config.graph.pivot.aggregatorName];
+      container.pivot([columnNames].concat(resultRows), {
+        cols: cols,
+        rows: rows,
+        aggregator: aggregatorName(values),
+        renderer: rendererName
+      });
+      var pvtable = container.children()[0];
+      //allow resize the pivot table with paragraph
+      pvtable.style.width = '100%';
+      pvtable.style.height = '99%';
+      container[0].childNodes[0].firstChild.childNodes[0].bgColor = '#EEE';
+    };
+    var retryRenderer = function() {
+      if (angular.element('#p' + $scope.paragraph.id + '_pivot').length) {
+        try {
+          renderTablePivot();
+        } catch (err) {
+          console.log('Chart drawing error %o', err);
+        }
+      } else {
+        $timeout(retryRenderer,10);
+      }
+    };
+    $timeout(retryRenderer);
+  };
+
+  var objectToArray = function(array) {
+    var copy = [];
+    for (var i = 0; i < array.length; i++) {
+      copy[i] = array[i].name;
+    }
+    return copy;
   };
 
   var groupedThousandsWith3DigitsFormatter = function(x) {
@@ -1495,6 +1571,35 @@ angular.module('zeppelinWebApp').controller('ParagraphCtrl', function($scope, $r
     $scope.setGraphMode($scope.paragraph.config.graph.mode, true, false);
   };
 
+  $scope.removePivotOptionCols = function(idx) {
+    $scope.paragraph.config.graph.pivot.cols.splice(idx, 1);
+    clearUnknownColsFromGraphOption();
+    $scope.setGraphMode($scope.paragraph.config.graph.mode, true, false);
+  };
+
+  $scope.removePivotOptionRows = function(idx) {
+    $scope.paragraph.config.graph.pivot.rows.splice(idx, 1);
+    clearUnknownColsFromGraphOption();
+    $scope.setGraphMode($scope.paragraph.config.graph.mode, true, false);
+  };
+
+  $scope.removePivotOptionValues = function(idx) {
+    $scope.paragraph.config.graph.pivot.values.splice(idx, 1);
+    clearUnknownColsFromGraphOption();
+    $scope.setGraphMode($scope.paragraph.config.graph.mode, true, false);
+  };
+
+  $scope.setPivotAggregatorName = function(idx, aggr) {
+    $scope.paragraph.config.graph.pivot.values[idx].aggr = aggr;
+    $scope.paragraph.config.graph.pivot.aggregatorName = aggr;
+    $scope.onGraphOptionChange();
+  };
+
+  $scope.setPivotRendererName = function(name) {
+    $scope.paragraph.config.graph.pivot.rendererName = name;
+    $scope.onGraphOptionChange();
+  };
+
   /* Clear unknown columns from graph option */
   var clearUnknownColsFromGraphOption = function() {
     var unique = function(list) {
@@ -1557,6 +1662,19 @@ angular.module('zeppelinWebApp').controller('ParagraphCtrl', function($scope, $r
     unique($scope.paragraph.config.graph.map.pinCols);
     removeUnknown($scope.paragraph.config.graph.map.pinCols);
     removeUnknownFromFields($scope.paragraph.config.graph.map);
+
+    unique($scope.paragraph.config.graph.pivot.cols);
+    removeUnknown($scope.paragraph.config.graph.pivot.cols);
+
+    unique($scope.paragraph.config.graph.pivot.rows);
+    removeUnknown($scope.paragraph.config.graph.pivot.rows);
+
+    unique($scope.paragraph.config.graph.pivot.values);
+    removeUnknown($scope.paragraph.config.graph.pivot.values);
+    //pivot cannot have more than 1 value
+    for (var i = 1; i < $scope.paragraph.config.graph.pivot.values.length; i++) {
+      $scope.paragraph.config.graph.pivot.values.splice(i, 1);
+    }
   };
 
   /* select default key and value if there're none selected */

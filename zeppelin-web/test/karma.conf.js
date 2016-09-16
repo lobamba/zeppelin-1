@@ -63,6 +63,7 @@ module.exports = function(config) {
       'bower_components/moment/moment.js',
       'bower_components/pikaday/pikaday.js',
       'bower_components/handsontable/dist/handsontable.js',
+      'bower_components/pivottable/dist/pivot.js',
       'bower_components/moment-duration-format/lib/moment-duration-format.js',
       'bower_components/select2/dist/js/select2.js',
       'bower_components/angular-esri-map/dist/angular-esri-map.js',

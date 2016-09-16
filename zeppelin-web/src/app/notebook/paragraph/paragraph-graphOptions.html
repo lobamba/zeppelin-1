@@ -43,4 +43,20 @@ limitations under the License.
     </span>
     <br/>
   </div>
+  <div ng-if="isGraphMode('pivot')">
+    <label>Type</label>
+    <span class="dropdown">
+      <button type="button" class="btn btn-default btn-sm dropdown-toggle" style="min-width: 0px;" data-toggle="dropdown">
+        <span ng-bind="paragraph.config.graph.pivot.rendererName"></span>
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" role="menu" style="min-width: 70px;">
+        <li ng-repeat="opt in pivotRendererName">
+          <a ng-click="setPivotRendererName(opt)">{{opt}}</a>
+        </li>
+      </ul>
+    </span>
+    <br/>
+  </div>
+
 </div>

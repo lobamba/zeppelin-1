@@ -32,7 +32,7 @@ limitations under the License.
     </ul>
   </div>
 
-  <div class="row" ng-if="getGraphMode()!='scatterChart' && getGraphMode()!='map'">
+  <div class="row" ng-if="getGraphMode()!='scatterChart' && getGraphMode()!='map' && getGraphMode()!='pivot'">
     <div class="col-md-4">
       <span class="columns lightBold">
         Keys
@@ -207,6 +207,67 @@ limitations under the License.
           <li ng-repeat="col in paragraph.config.graph.map.pinCols">
             <div class="btn btn-primary btn-xs">
               {{col.name}} <span class="fa fa-close" ng-click="removeMapOptionPinInfo($index)"></span>
+            </div>
+          </li>
+        </ul>
+      </span>
+    </div>
+  </div>
+  <!-- PIVOT -->
+  <div class="row" ng-if="getGraphMode()=='pivot'">
+    <div class="col-md-4">
+      <span class="columns lightBold">
+        Columns
+        <ul data-drop="true"
+            ng-model="paragraph.config.graph.pivot.cols"
+            jqyoui-droppable="{multiple:true, onDrop:'onGraphOptionChange()'}"
+            class="list-unstyled">
+          <li ng-repeat="item in paragraph.config.graph.pivot.cols">
+            <div class="btn btn-primary btn-xs">
+              {{item.name}} <span class="fa fa-close" ng-click="removePivotOptionCols($index)"></span>
+            </div>
+          </li>
+        </ul>
+      </span>
+    </div>
+    <div class="col-md-4">
+      <span class="columns lightBold">
+        Rows
+        <ul data-drop="true"
+            ng-model="paragraph.config.graph.pivot.rows"
+            jqyoui-droppable="{multiple:true, onDrop:'onGraphOptionChange()'}"
+            class="list-unstyled">
+          <li ng-repeat="item in paragraph.config.graph.pivot.rows">
+            <div class="btn btn-success btn-xs">
+              {{item.name}} <span class="fa fa-close" ng-click="removePivotOptionRows($index)"></span>
+            </div>
+          </li>
+        </ul>
+      </span>
+    </div>
+    <div class="col-md-4">
+      <span class="columns lightBold">
+        Values
+        <ul data-drop="true"
+            ng-model="paragraph.config.graph.pivot.values"
+            jqyoui-droppable="{multiple:true, onDrop:'onGraphOptionChange()'}"
+            class="list-unstyled">
+          <li ng-repeat="item in paragraph.config.graph.pivot.values">
+            <div class="btn-group">
+              <div class="btn btn-info btn-xs dropdown-toggle"
+                   type="button"
+                   data-toggle="dropdown">
+                {{item.name | limitTo: 30}}{{item.name.length > 30 ? '...' : ''}}
+                <font style="color:#EEEEEE;"><span class="lightBold" style="text-transform: uppercase;">{{item.aggr}}</span></font>
+                <span class="fa fa-close" ng-click="removePivotOptionValues($index)"></span>
+              </div>
+              <ul class="dropdown-menu" role="menu">
+                <li ng-click="setPivotAggregatorName($index, 'Sum')"><a>sum</a></li>
+                <li ng-click="setPivotAggregatorName($index, 'Count')"><a>count</a></li>
+                <li ng-click="setPivotAggregatorName($index, 'Average')"><a>avg</a></li>
+                <li ng-click="setPivotAggregatorName($index, 'Minimum')"><a>min</a></li>
+                <li ng-click="setPivotAggregatorName($index, 'Maximum')"><a>max</a></li>
+              </ul>
             </div>
           </li>
         </ul>

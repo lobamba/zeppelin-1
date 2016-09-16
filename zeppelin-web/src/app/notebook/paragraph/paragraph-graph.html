@@ -22,6 +22,11 @@ limitations under the License.
        class="table">
   </div>
 
+  <div ng-if="getGraphMode()=='pivot'"
+       id="p{{paragraph.id}}_pivot"
+       class="pivot">
+  </div>
+
   <div ng-if="getGraphMode()=='multiBarChart'"
        id="p{{paragraph.id}}_multiBarChart">
     <svg></svg>
