@@ -1,0 +1,15 @@
+[
+  {
+    "group": "jruby",
+    "name": "jruby",
+    "className": "org.apache.zeppelin.jruby.JrubyInterpreter",
+    "properties": {
+      "ruby.source": {
+        "envName": null,
+        "propertyName": "ruby.source",
+        "defaultValue": "C:/Ruby22-x64/lib",
+        "description": "The ruby path"
+      }
+    }
+  }
+]
