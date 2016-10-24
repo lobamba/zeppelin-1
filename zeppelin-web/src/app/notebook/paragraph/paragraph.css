@@ -67,6 +67,10 @@ table.dataTable.table-condensed .sorting_desc:after {
   right: 12px;
 }
 
+table.pvtTable tr th {
+  background-color: #EEE;
+}
+
 .graphContainer {
   position: relative;
   margin-bottom: 5px;

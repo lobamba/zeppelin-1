@@ -486,7 +486,7 @@ public class ZeppelinConfiguration extends XMLConfiguration {
   public static enum ConfVars {
     ZEPPELIN_HOME("zeppelin.home", "./"),
     ZEPPELIN_ADDR("zeppelin.server.addr", "0.0.0.0"),
-    ZEPPELIN_PORT("zeppelin.server.port", 8080),
+    ZEPPELIN_PORT("zeppelin.server.port", 1234),
     ZEPPELIN_SERVER_CONTEXT_PATH("zeppelin.server.context.path", "/"),
     ZEPPELIN_SSL("zeppelin.ssl", false),
     ZEPPELIN_SSL_CLIENT_AUTH("zeppelin.ssl.client.auth", false),
